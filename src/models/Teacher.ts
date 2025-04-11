@@ -51,8 +51,11 @@ export class Teacher {
         const teacher = new Teacher(json.name, json.email);
         teacher._id = json.id;
         if (json.courses) {
-            teacher._courses = json.courses.map((c: any) => 
-                Object.assign(new Course(c.title, c.subject), { _id: c.id }));
+            teacher._courses = json.courses.map((c: any) => {
+                const course = new Course(c.title, c.subject);
+                Object.defineProperty(course, '_id', { value: c.id });
+                return course;
+            });
         }
         return teacher;
     }

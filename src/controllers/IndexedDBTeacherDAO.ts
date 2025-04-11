@@ -33,11 +33,23 @@ export class IndexedDBTeacherDAO implements TeacherDAO {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readwrite');
             const store = transaction.objectStore(this.storeName);
-            const request = store.add(teacher);
+            const request = store.add(teacher.toJSON());
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => resolve();
         });
+    }
+
+    async findByEmail(email: string): Promise<Teacher | undefined> {
+        const allTeachers = await this.findAll();
+        return allTeachers.find(teacher => teacher.email === email);
+    }
+
+    async findByCourse(courseId: string): Promise<Teacher[]> {
+        const allTeachers = await this.findAll();
+        return allTeachers.filter(teacher => 
+            teacher.courses.some(course => course.id === courseId)
+        );
     }
 
     async findById(id: string): Promise<Teacher | undefined> {
@@ -48,28 +60,9 @@ export class IndexedDBTeacherDAO implements TeacherDAO {
             const request = store.get(id);
 
             request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => 
+                resolve(request.result ? Teacher.fromJSON(request.result) : undefined);
         });
-    }
-
-    async findByEmail(email: string): Promise<Teacher | undefined> {
-        const db = await this.getDB();
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([this.storeName], 'readonly');
-            const store = transaction.objectStore(this.storeName);
-            const index = store.index('email');
-            const request = index.get(email);
-
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
-        });
-    }
-
-    async findByCourse(courseId: string): Promise<Teacher | undefined> {
-        const teachers = await this.findAll();
-        return teachers.find(teacher => 
-            teacher.courses.some(course => course.id === courseId)
-        );
     }
 
     async findAll(): Promise<Teacher[]> {
@@ -80,7 +73,8 @@ export class IndexedDBTeacherDAO implements TeacherDAO {
             const request = store.getAll();
 
             request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => 
+                resolve(request.result.map((data: any) => Teacher.fromJSON(data)));
         });
     }
 
@@ -89,7 +83,7 @@ export class IndexedDBTeacherDAO implements TeacherDAO {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readwrite');
             const store = transaction.objectStore(this.storeName);
-            const request = store.put(teacher);
+            const request = store.put(teacher.toJSON());
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => resolve();
