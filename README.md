@@ -88,6 +88,7 @@ static fromJSON(json: any): Resource {
 - Unique indices for email fields
 - Complex relationship handling
 - CRUD operations for all entities
+- Extra services management for students (tutoring, sports, arts) // Added feature
 
 ---
 
@@ -100,8 +101,16 @@ static fromJSON(json: any): Resource {
 
 ### Student
 
-- **Properties**: `id`, `name`, `email`, `enrolledCourses`
-- **Methods**: `enroll`, `withdraw`
+- **Properties**: 
+  - `id`
+  - `name`
+  - `email`
+  - `enrolledCourses`
+  - `extraServices` // Added service tracking
+- **Methods**: 
+  - `enroll`
+  - `withdraw`
+  - `addService` // Added service management
 
 ### Course
 
@@ -118,6 +127,13 @@ static fromJSON(json: any): Resource {
 ## 🧪 Testing
 
 Comprehensive test suites for each DAO:
+- Student tests include:
+  - Basic CRUD operations
+  - Course enrollment
+  - Service management (tutoring, sports, arts)
+  - Email-based search
+  - Course-based filtering
+  - Service-based filtering
 
 ```bash
 npx ts-node src/tests/testTeacherDAO.ts
