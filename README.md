@@ -1,3 +1,9 @@
+# authors :
+
+# - Haloubi Reda
+
+# - Anas Bousetta
+
 # School Management System
 
 A TypeScript-based school management system using IndexedDB for data persistence and implementing various design patterns.
@@ -101,13 +107,13 @@ static fromJSON(json: any): Resource {
 
 ### Student
 
-- **Properties**: 
+- **Properties**:
   - `id`
   - `name`
   - `email`
   - `enrolledCourses`
   - `extraServices` // Added service tracking
-- **Methods**: 
+- **Methods**:
   - `enroll`
   - `withdraw`
   - `addService` // Added service management
@@ -127,6 +133,7 @@ static fromJSON(json: any): Resource {
 ## 🧪 Testing
 
 Comprehensive test suites for each DAO:
+
 - Student tests include:
   - Basic CRUD operations
   - Course enrollment
