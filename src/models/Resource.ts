@@ -49,4 +49,31 @@ export class Resource {
             this._courses.push(course);
         }
     }
+
+    toJSON() {
+        return {
+            id: this._id,
+            name: this._name,
+            type: this._type,
+            available: this._available,
+            courses: this._courses.map(course => ({
+                id: course.id,
+                title: course.title,
+                subject: course.subject
+            }))
+        };
+    }
+
+    static fromJSON(json: any): Resource {
+        const resource = new Resource(json.name, json.type, json.available);
+        resource._id = json.id;
+        if (json.courses) {
+            resource._courses = json.courses.map((c: any) => {
+                const course = new Course(c.title, c.subject);
+                Object.defineProperty(course, '_id', { value: c.id });
+                return course;
+            });
+        }
+        return resource;
+    }
 }

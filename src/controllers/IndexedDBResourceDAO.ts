@@ -32,7 +32,19 @@ export class IndexedDBResourceDAO implements ResourceDAO {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readwrite');
             const store = transaction.objectStore(this.storeName);
-            const request = store.add(resource);
+            const request = store.add(resource.toJSON());
+
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve();
+        });
+    }
+
+    async update(resource: Resource): Promise<void> {
+        const db = await this.getDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([this.storeName], 'readwrite');
+            const store = transaction.objectStore(this.storeName);
+            const request = store.put(resource.toJSON());
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => resolve();
@@ -47,7 +59,8 @@ export class IndexedDBResourceDAO implements ResourceDAO {
             const request = store.get(id);
 
             request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => 
+                resolve(request.result ? Resource.fromJSON(request.result) : undefined);
         });
     }
 
@@ -59,19 +72,8 @@ export class IndexedDBResourceDAO implements ResourceDAO {
             const request = store.getAll();
 
             request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
-        });
-    }
-
-    async update(resource: Resource): Promise<void> {
-        const db = await this.getDB();
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([this.storeName], 'readwrite');
-            const store = transaction.objectStore(this.storeName);
-            const request = store.put(resource);
-
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve();
+            request.onsuccess = () => 
+                resolve(request.result.map((data: any) => Resource.fromJSON(data)));
         });
     }
 
