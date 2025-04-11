@@ -1,9 +1,9 @@
-import { Resource } from '../models/Resource';
-import { ResourceDAO } from './ResourceDAO';
+import { Student } from '../models/Student';
+import { StudentDAO } from '../dao/StudentDAO';
 
-export class IndexedDBResourceDAO implements ResourceDAO {
+export class IndexedDBStudentDAO implements StudentDAO {
     private dbName = 'SchoolManagementSystem';
-    private storeName = 'resources';
+    private storeName = 'students';
     private db: IDBDatabase | null = null;
 
     private async getDB(): Promise<IDBDatabase> {
@@ -21,25 +21,26 @@ export class IndexedDBResourceDAO implements ResourceDAO {
             request.onupgradeneeded = (event) => {
                 const db = (event.target as IDBOpenDBRequest).result;
                 if (!db.objectStoreNames.contains(this.storeName)) {
-                    db.createObjectStore(this.storeName, { keyPath: 'id' });
+                    const store = db.createObjectStore(this.storeName, { keyPath: 'id' });
+                    store.createIndex('email', 'email', { unique: true });
                 }
             };
         });
     }
 
-    async save(resource: Resource): Promise<void> {
+    async save(student: Student): Promise<void> {
         const db = await this.getDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readwrite');
             const store = transaction.objectStore(this.storeName);
-            const request = store.add(resource);
+            const request = store.add(student);
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => resolve();
         });
     }
 
-    async findById(id: string): Promise<Resource | undefined> {
+    async findById(id: string): Promise<Student | undefined> {
         const db = await this.getDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readonly');
@@ -51,7 +52,27 @@ export class IndexedDBResourceDAO implements ResourceDAO {
         });
     }
 
-    async findAll(): Promise<Resource[]> {
+    async findByEmail(email: string): Promise<Student | undefined> {
+        const db = await this.getDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([this.storeName], 'readonly');
+            const store = transaction.objectStore(this.storeName);
+            const index = store.index('email');
+            const request = index.get(email);
+
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+        });
+    }
+
+    async findByCourse(courseId: string): Promise<Student[]> {
+        const students = await this.findAll();
+        return students.filter(student => 
+            student.enrolledCourses.some(course => course.id === courseId)
+        );
+    }
+
+    async findAll(): Promise<Student[]> {
         const db = await this.getDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readonly');
@@ -63,12 +84,12 @@ export class IndexedDBResourceDAO implements ResourceDAO {
         });
     }
 
-    async update(resource: Resource): Promise<void> {
+    async update(student: Student): Promise<void> {
         const db = await this.getDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readwrite');
             const store = transaction.objectStore(this.storeName);
-            const request = store.put(resource);
+            const request = store.put(student);
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => resolve();

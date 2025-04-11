@@ -5,5 +5,5 @@ export default {
         '^.+\\.tsx?$': 'ts-jest',
     },
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-    setupFiles: ['fake-indexeddb/auto'],
+    setupFiles: ['<rootDir>/src/__tests__/setup.ts'],
 };

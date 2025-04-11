@@ -1,6 +1,6 @@
 import { Course } from '../models/Course';
-import { CourseDAO } from './CourseDAO';
-import { IndexedDBManager } from './IndexedDBManager';
+import { CourseDAO } from '../dao/CourseDAO';
+import { IndexedDBManager } from '../dao/IndexedDBManager';
 
 export class IndexedDBCourseDAO implements CourseDAO {
     private dbManager: IndexedDBManager;

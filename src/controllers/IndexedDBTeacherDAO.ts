@@ -1,5 +1,5 @@
 import { Teacher } from '../models/Teacher';
-import { TeacherDAO } from './TeacherDAO';
+import { TeacherDAO } from '../dao/TeacherDAO';
 
 export class IndexedDBTeacherDAO implements TeacherDAO {
     private dbName = 'SchoolManagementSystem';

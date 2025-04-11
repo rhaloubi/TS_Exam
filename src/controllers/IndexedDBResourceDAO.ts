@@ -1,9 +1,9 @@
-import { Student } from '../models/Student';
-import { StudentDAO } from './StudentDAO';
+import { Resource } from '../models/Resource';
+import { ResourceDAO } from '../dao/ResourceDAO';
 
-export class IndexedDBStudentDAO implements StudentDAO {
+export class IndexedDBResourceDAO implements ResourceDAO {
     private dbName = 'SchoolManagementSystem';
-    private storeName = 'students';
+    private storeName = 'resources';
     private db: IDBDatabase | null = null;
 
     private async getDB(): Promise<IDBDatabase> {
@@ -21,26 +21,25 @@ export class IndexedDBStudentDAO implements StudentDAO {
             request.onupgradeneeded = (event) => {
                 const db = (event.target as IDBOpenDBRequest).result;
                 if (!db.objectStoreNames.contains(this.storeName)) {
-                    const store = db.createObjectStore(this.storeName, { keyPath: 'id' });
-                    store.createIndex('email', 'email', { unique: true });
+                    db.createObjectStore(this.storeName, { keyPath: 'id' });
                 }
             };
         });
     }
 
-    async save(student: Student): Promise<void> {
+    async save(resource: Resource): Promise<void> {
         const db = await this.getDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readwrite');
             const store = transaction.objectStore(this.storeName);
-            const request = store.add(student);
+            const request = store.add(resource);
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => resolve();
         });
     }
 
-    async findById(id: string): Promise<Student | undefined> {
+    async findById(id: string): Promise<Resource | undefined> {
         const db = await this.getDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readonly');
@@ -52,27 +51,7 @@ export class IndexedDBStudentDAO implements StudentDAO {
         });
     }
 
-    async findByEmail(email: string): Promise<Student | undefined> {
-        const db = await this.getDB();
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([this.storeName], 'readonly');
-            const store = transaction.objectStore(this.storeName);
-            const index = store.index('email');
-            const request = index.get(email);
-
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
-        });
-    }
-
-    async findByCourse(courseId: string): Promise<Student[]> {
-        const students = await this.findAll();
-        return students.filter(student => 
-            student.enrolledCourses.some(course => course.id === courseId)
-        );
-    }
-
-    async findAll(): Promise<Student[]> {
+    async findAll(): Promise<Resource[]> {
         const db = await this.getDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readonly');
@@ -84,12 +63,12 @@ export class IndexedDBStudentDAO implements StudentDAO {
         });
     }
 
-    async update(student: Student): Promise<void> {
+    async update(resource: Resource): Promise<void> {
         const db = await this.getDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readwrite');
             const store = transaction.objectStore(this.storeName);
-            const request = store.put(student);
+            const request = store.put(resource);
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => resolve();
