@@ -2,7 +2,7 @@
 
 # - Haloubi Reda
 
-# - Anas Bousetta
+# - Anas Boucetta
 
 # School Management System
 
