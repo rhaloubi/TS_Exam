@@ -11,6 +11,12 @@ export class IndexedDBStudentDAO implements StudentDAO {
             student.enrolledCourses.some(course => course.id === courseId)
         ).map(student => Student.fromJSON(student));
     }
+    async findByService(serviceName: string): Promise<Student[]> {
+        const allStudents = await this.findAll();
+        return allStudents.filter(student => 
+            student.extraServices.includes(serviceName)
+        );
+    }
     private dbName = 'SchoolManagementSystem';
     private storeName = 'students';
     private db: IDBDatabase | null = null;

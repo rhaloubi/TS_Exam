@@ -90,6 +90,35 @@ async function testStudentDAO() {
         }
         console.log('✓ Course enrollment verified');
 
+        // Test 7: Services management
+        student1.addService('sports');
+        student1.addService('art_club');
+        await dao.update(student1);
+        const updatedWithServices = await dao.findById(student1.id);
+        console.log('\n🎨 Test 7 - Student with services:', {
+            id: updatedWithServices?.id,
+            name: updatedWithServices?.name,
+            services: updatedWithServices?.extraServices
+        });
+        if (!updatedWithServices?.extraServices.includes('sports') || 
+            !updatedWithServices?.extraServices.includes('art_club') ||
+            !updatedWithServices?.extraServices.includes('tutoring')) {
+            throw new Error('Failed to manage multiple services');
+        }
+        console.log('✓ Multiple services managed successfully');
+
+        // Test 8: Find students by service
+        const studentsInSports = await dao.findByService('sports');
+        console.log('\n🏃 Test 8 - Students in sports:', studentsInSports.map(s => ({
+            id: s.id,
+            name: s.name,
+            services: s.extraServices
+        })));
+        if (studentsInSports.length !== 1 || !studentsInSports[0].extraServices.includes('sports')) {
+            throw new Error('Failed to find students by service');
+        }
+        console.log('✓ Service search successful');
+
         console.log('\n✨ All tests completed successfully!');
 
     } catch (error) {

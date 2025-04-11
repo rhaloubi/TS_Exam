@@ -8,4 +8,5 @@ export interface StudentDAO {
     delete(id: string): Promise<void>;
     findByEmail(email: string): Promise<Student | undefined>;
     findByCourse(courseId: string): Promise<Student[]>;
+    findByService(serviceName: string): Promise<Student[]>;
 }
