@@ -2,6 +2,15 @@ import { Student } from '../models/Student';
 import { StudentDAO } from '../dao/StudentDAO';
 
 export class IndexedDBStudentDAO implements StudentDAO {
+    delete(id: string): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+    async findByCourse(courseId: string): Promise<Student[]> {
+        const allStudents = await this.findAll();
+        return allStudents.filter(student => 
+            student.enrolledCourses.some(course => course.id === courseId)
+        ).map(student => Student.fromJSON(student));
+    }
     private dbName = 'SchoolManagementSystem';
     private storeName = 'students';
     private db: IDBDatabase | null = null;
@@ -33,7 +42,7 @@ export class IndexedDBStudentDAO implements StudentDAO {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readwrite');
             const store = transaction.objectStore(this.storeName);
-            const request = store.add(student);
+            const request = store.add(student.toJSON());
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => resolve();
@@ -48,7 +57,8 @@ export class IndexedDBStudentDAO implements StudentDAO {
             const request = store.get(id);
 
             request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => 
+                resolve(request.result ? Student.fromJSON(request.result) : undefined);
         });
     }
 
@@ -61,15 +71,9 @@ export class IndexedDBStudentDAO implements StudentDAO {
             const request = index.get(email);
 
             request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => 
+                resolve(request.result ? Student.fromJSON(request.result) : undefined);
         });
-    }
-
-    async findByCourse(courseId: string): Promise<Student[]> {
-        const students = await this.findAll();
-        return students.filter(student => 
-            student.enrolledCourses.some(course => course.id === courseId)
-        );
     }
 
     async findAll(): Promise<Student[]> {
@@ -80,7 +84,8 @@ export class IndexedDBStudentDAO implements StudentDAO {
             const request = store.getAll();
 
             request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => 
+                resolve(request.result.map((data: any) => Student.fromJSON(data)));
         });
     }
 
@@ -89,19 +94,7 @@ export class IndexedDBStudentDAO implements StudentDAO {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction([this.storeName], 'readwrite');
             const store = transaction.objectStore(this.storeName);
-            const request = store.put(student);
-
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve();
-        });
-    }
-
-    async delete(id: string): Promise<void> {
-        const db = await this.getDB();
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([this.storeName], 'readwrite');
-            const store = transaction.objectStore(this.storeName);
-            const request = store.delete(id);
+            const request = store.put(student.toJSON());
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => resolve();
