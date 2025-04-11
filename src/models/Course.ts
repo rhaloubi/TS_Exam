@@ -56,4 +56,32 @@ export class Course {
             resource.addCourse(this);
         }
     }
+
+    toJSON() {
+        return {
+            id: this._id,
+            title: this._title,
+            subject: this._subject,
+            teacher: this._teacher?.toJSON(),
+            students: this._students.map(student => ({
+                id: student.id,
+                name: student.name,
+                email: student.email
+            })),
+            resources: this._resources.map(resource => ({
+                id: resource.id,
+                name: resource.name,
+                type: resource.type
+            }))
+        };
+    }
+
+    static fromJSON(json: any): Course {
+        const course = new Course(json.title, json.subject);
+        course._id = json.id;
+        if (json.teacher) {
+            course._teacher = Teacher.fromJSON(json.teacher);
+        }
+        return course;
+    }
 }
