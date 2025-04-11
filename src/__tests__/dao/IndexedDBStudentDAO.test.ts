@@ -1,7 +1,7 @@
-import test, { describe, beforeEach, afterEach } from 'node:test';
 import { IndexedDBStudentDAO } from '../../dao/IndexedDBStudentDAO';
 import { Course } from '../../models/Course';
 import { Student } from '../../models/Student';
+import { expect, test, describe, beforeEach, afterEach } from '@jest/globals';
 
 describe('IndexedDBStudentDAO', () => {
     let dao: IndexedDBStudentDAO;
@@ -70,7 +70,3 @@ describe('IndexedDBStudentDAO', () => {
         expect(studentsInCourse[0].id).toBe(mockStudent.id);
     });
 });
-
-function expect(retrieved: Student | undefined) {
-    throw new Error('Function not implemented.');
-}

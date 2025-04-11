@@ -20,7 +20,7 @@ export class Student {
         return this._name;
     }
 
-    get email(): string {
+    get email(): string  {
         return this._email;
     }
 
