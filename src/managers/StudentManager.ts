@@ -1,6 +1,7 @@
 import { Student } from '../models/Student';
 import { StudentDAO } from '../dao/StudentDAO';
 import { IndexedDBStudentDAO } from '../dao/IndexedDBStudentDAO';
+import { Course } from '../models/Course';
 
 export class StudentManager {
     private static instance: StudentManager;
